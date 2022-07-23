@@ -46,6 +46,42 @@
       template.innerHTML = html;
       return template.content.firstChild;
     }
+
+    function htmlFromData({ userName, avatar, timeAgo, comment, upvoteCount }) {
+      return `
+        <div class="flex flex-row my-4">
+          <img src="${avatar}" class="rounded-full w-12 h-12 mr-4" />
+          <div class="flex flex-col">
+            <div class="flex items-center">
+              <span class="darker-blue font-bold">${userName}</span>
+              <span class="dark-blue font-light text-sm">・${timeAgo}</span>
+            </div>
+            <p class="darker-blue my-1">${comment}</p>
+            <div class="font-bold dark-blue text-xs my-4"><span class=" mr-8"><span class="mr-1">▲</span> Upvote ${upvoteCount > 0 ? `(${upvoteCount})` : ''} </span><span>Reply</span></div>
+          </div>
+        </div>`
+    }
+
+    docReady(async function () {
+      // choose a random userName on each page load
+      const userName = `AnonymousUser#${Math.floor(Math.random()*10)}`
+
+      // TODO replace this with server call
+      const comments = [{
+        userName: "Johnny Domino",
+        avatar: "https://avatars.githubusercontent.com/u/368767?v=4",
+        timeAgo: "45 min ago",
+        comment: "I comment, therefore I am.",
+        upvoteCount: 4
+      }]
+
+      // render html blobs for each comment
+      const commentElements = comments.map(htmlFromData)
+
+      // add them to the DOM
+      const commentsParent = window.document.getElementById('comments')
+      commentElements.forEach((el) => commentsParent.appendChild(htmlToElement(el)))
+    });
   </script>
 </head>
 
