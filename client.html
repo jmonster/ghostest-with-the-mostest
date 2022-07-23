@@ -26,6 +26,27 @@
     }
   </style>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // i.e. $(document).ready(() => {})
+    // compliments of https://stackoverflow.com/a/9899701
+    function docReady(fn) {
+      // see if DOM is already available
+      if (document.readyState === "complete" || document.readyState === "interactive") {
+        // call on next available tick
+        setTimeout(fn, 1);
+      } else {
+        document.addEventListener("DOMContentLoaded", fn);
+      }
+    }
+
+    // compliments of https://stackoverflow.com/a/35385518
+    function htmlToElement(html) {
+      var template = document.createElement('template');
+      html = html.trim(); // Never return a text node of whitespace as the result
+      template.innerHTML = html;
+      return template.content.firstChild;
+    }
+  </script>
 </head>
 
 <body class="m-2 w-full max-w-4xl mx-auto bg-neutral-200">
