@@ -81,6 +81,20 @@
       // add them to the DOM
       const commentsParent = window.document.getElementById('comments')
       commentElements.forEach((el) => commentsParent.appendChild(htmlToElement(el)))
+
+      // wire-up comment submit button
+      const submitBtn = document.getElementById('submitCommentBtn')
+      submitBtn.onclick = () => {
+        const newComment = document.getElementById('new-comment-input').value
+        if (newComment.length === 0) return;
+
+        const html = htmlFromData({ userName, avatar: "https://avatars.githubusercontent.com/u/368767?v=4", timeAgo: "a while ago", comment: newComment })
+        commentsParent.appendChild(htmlToElement(html))
+        document.getElementById('new-comment-input').value = ""
+
+        // TODO persist to server/DB
+        // TODO handle errors
+      }
     });
   </script>
 </head>
