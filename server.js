@@ -6,6 +6,7 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
+const DATABASE_URL = process.env.DATABASE_URL;
 const pathToHTML = path.join(__dirname, "client.html");
 const PORT = 3000 || process.env.PORT;
 
