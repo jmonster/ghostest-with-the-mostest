@@ -11,20 +11,7 @@
     content="A small piece of work which is similar to the type of projects we take on every day at Ghost." />
   <meta property="og:description"
     content="A small piece of work which is similar to the type of projects we take on every day at Ghost." />
-  <style>
-    /* Values taken from Figma */
-    .primary-btn {
-      background-color: #7E34F6;
-    }
-
-    .dark-blue {
-      color: rgba(75, 88, 124, 1);
-    }
-
-    .darker-blue {
-      color: rgba(33, 41, 60, 1);
-    }
-  </style>
+  <link rel="stylesheet" href="/stylesheets/style.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     // i.e. $(document).ready(() => {})
@@ -47,34 +34,28 @@
       return template.content.firstChild;
     }
 
-    function htmlFromData({ userName, avatar, timeAgo, comment, upvoteCount }) {
+    function htmlFromData({ user_name, avatar_url, created_at, body, upvote_count }) {
       return `
         <div class="flex flex-row my-4">
-          <img src="${avatar}" class="rounded-full w-12 h-12 mr-4" />
+          <img src="${avatar_url}" class="rounded-full w-12 h-12 mr-4" />
           <div class="flex flex-col">
             <div class="flex items-center">
-              <span class="darker-blue font-bold">${userName}</span>
-              <span class="dark-blue font-light text-sm">・${timeAgo}</span>
+              <span class="darker-blue font-bold">${user_name}</span>
+              <span class="dark-blue font-light text-sm">・${created_at}</span>
             </div>
-            <p class="darker-blue my-1">${comment}</p>
-            <div class="font-bold dark-blue text-xs my-4"><span class=" mr-8"><span class="mr-1">▲</span> Upvote ${upvoteCount > 0 ? `(${upvoteCount})` : ''} </span><span>Reply</span></div>
+            <p class="darker-blue my-1">${body}</p>
+            <div class="font-bold dark-blue text-xs my-4"><span class=" mr-8"><span class="mr-1">▲</span> Upvote ${upvote_count > 0 ? `(${upvote_count})` : ''} </span><span>Reply</span></div>
           </div>
         </div>`
     }
 
     docReady(async function () {
-      // choose a random userName on each page load
-      const userName = `AnonymousUser#${Math.floor(Math.random()*10)}`
+      // choose a random user_name on each page load
+      // TODO pick a random user_name/avatar from a set
+      const user_name = `AnonymousUser#${Math.floor(Math.random()*10)}`
+      const avatar_url = "https://avatars.githubusercontent.com/u/368767?v=4"
 
-      // TODO replace this with server call
-      const comments = [{
-        userName: "Johnny Domino",
-        avatar: "https://avatars.githubusercontent.com/u/368767?v=4",
-        timeAgo: "45 min ago",
-        comment: "I comment, therefore I am.",
-        upvoteCount: 4
-      }]
-
+      // Each page/document/context/whatever has a unique "rootCategory" that all messages are nested/scoped under
       // render html blobs for each comment
       const commentElements = comments.map(htmlFromData)
 
@@ -84,16 +65,13 @@
 
       // wire-up comment submit button
       const submitBtn = document.getElementById('submitCommentBtn')
-      submitBtn.onclick = () => {
-        const newComment = document.getElementById('new-comment-input').value
-        if (newComment.length === 0) return;
+      submitBtn.onclick = async () => {
+        const comment = document.getElementById('new-comment-input').value
+        if (comment.length === 0) return;
 
-        const html = htmlFromData({ userName, avatar: "https://avatars.githubusercontent.com/u/368767?v=4", timeAgo: "a while ago", comment: newComment })
+        const html = htmlFromData({ user_name, avatar_url, created_at: "a while ago", body: comment })
         commentsParent.appendChild(htmlToElement(html))
         document.getElementById('new-comment-input').value = ""
-
-        // TODO persist to server/DB
-        // TODO handle errors
       }
     });
   </script>

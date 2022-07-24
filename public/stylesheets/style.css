@@ -1,0 +1,13 @@
+/* Values courtesy of https://www.figma.com/file/Yisi8jzU9vzdhTuw4PnevW/Coding-Challenge */
+
+.primary-btn {
+  background-color: #7e34f6;
+}
+
+.dark-blue {
+  color: rgba(75, 88, 124, 1);
+}
+
+.darker-blue {
+  color: rgba(33, 41, 60, 1);
+}
