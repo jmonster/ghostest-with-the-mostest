@@ -34,13 +34,13 @@
       return template.content.firstChild;
     }
 
-    function htmlFromData({ user_name, avatar_url, created_at, body, upvote_count }) {
+    function htmlFromData({ users_name, avatar_url, created_at, body, upvote_count }) {
       return `
         <div class="flex flex-row my-4">
           <img src="${avatar_url}" class="rounded-full w-12 h-12 mr-4" />
           <div class="flex flex-col">
             <div class="flex items-center">
-              <span class="darker-blue font-bold">${user_name}</span>
+              <span class="darker-blue font-bold">${users_name}</span>
               <span class="dark-blue font-light text-sm">・${created_at}</span>
             </div>
             <p class="darker-blue my-1">${body}</p>
@@ -50,9 +50,9 @@
     }
 
     docReady(async function () {
-      // choose a random user_name on each page load
-      // TODO pick a random user_name/avatar from a set
-      const user_name = `AnonymousUser#${Math.floor(Math.random()*10)}`
+      // choose a random users_name on each page load
+      // TODO pick a random users_name/avatar from a set
+      const users_name = `AnonymousUser#${Math.floor(Math.random()*10)}`
       const avatar_url = "https://avatars.githubusercontent.com/u/368767?v=4"
 
       // Each page/document/context/whatever has a unique "rootCategory" that all messages are nested/scoped under
@@ -69,7 +69,7 @@
         const comment = document.getElementById('new-comment-input').value
         if (comment.length === 0) return;
 
-        const html = htmlFromData({ user_name, avatar_url, created_at: "a while ago", body: comment })
+        const html = htmlFromData({ users_name, avatar_url, created_at: "a while ago", body: comment })
         commentsParent.appendChild(htmlToElement(html))
         document.getElementById('new-comment-input').value = ""
       }
