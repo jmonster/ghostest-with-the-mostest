@@ -43,4 +43,16 @@ router.post("/comments/new", async function (req, res) {
   res.sendStatus(201);
 });
 
+router.post("/comments/upvote", async function (req, res) {
+  // TODO prevent the same user from upvoting the same comment more than once
+
+  const commentId = req.body.id;
+  await pg.raw(
+    `UPDATE comments SET upvote_count = upvote_count + 1 WHERE id = ?`,
+    commentId
+  );
+
+  res.sendStatus(204);
+});
+
 module.exports = router;
