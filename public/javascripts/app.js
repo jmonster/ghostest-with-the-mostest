@@ -106,9 +106,7 @@ docReady(async function () {
     commentsParent.appendChild(htmlToElement(el))
   );
 
-  // wire-up comment submit button
-  const submitBtn = document.getElementById("submitCommentBtn");
-  submitBtn.onclick = async () => {
+  async function submitNewComment() {
     const comment = document.getElementById("new-comment-input").value;
     if (comment.length === 0) return;
 
@@ -138,6 +136,15 @@ docReady(async function () {
     if (newPostResponse.status !== 201) {
       throw new Error("Unexpected response from server.");
     }
+  }
+
+  // wire-up comment submit button
+  const submitBtn = document.getElementById("submitCommentBtn");
+  submitBtn.onclick = submitNewComment;
+
+  // post comment when the user presses Enter/Return
+  document.getElementById("new-comment-input").onkeyup = ({ code }) => {
+    if (code === "Enter") submitNewComment();
   };
 
   // TODO subscribe to notifications for new comments
