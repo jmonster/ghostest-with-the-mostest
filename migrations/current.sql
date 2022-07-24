@@ -25,45 +25,117 @@ CREATE TABLE
 
 -- Initial seed data for demonstration
 insert into
-  comments (id, users_name, body, avatar_url, upvote_count)
+  comments (
+    id,
+    users_name,
+    body,
+    avatar_url,
+    upvote_count,
+    created_at
+  )
 values
   (
     'e2781ebc-20a0-4f7f-b6b3-6ef00a1462f8',
     'Mr. Snrub',
     'I-- I say we invest that money back in the nuclear plant.',
     '/images/snrub.webp',
-    2
+    2,
+    '2022-07-24 19:57:56.681757+00'
   );
 
 insert into
-  comments (id, users_name, body, avatar_url, upvote_count)
+  upvotes (comment_id, users_name)
+values
+  (
+    'e2781ebc-20a0-4f7f-b6b3-6ef00a1462f8',
+    'Waylon Smithers'
+  );
+
+insert into
+  comments (
+    id,
+    users_name,
+    body,
+    avatar_url,
+    upvote_count,
+    created_at
+  )
 values
   (
     '92285661-d2d0-4859-bfad-e9d99db7fea3',
     'Waylon Smithers',
     'I like the way Snrub thinks.',
     '/images/smithers.webp',
-    1
+    1,
+    '2022-07-24 19:58:56.681757+00'
   );
 
 insert into
-  comments (id, users_name, body, avatar_url, upvote_count)
+  upvotes (comment_id, users_name)
+values
+  (
+    '92285661-d2d0-4859-bfad-e9d99db7fea3',
+    'Waylon Smithers'
+  );
+
+insert into
+  comments (
+    id,
+    users_name,
+    body,
+    avatar_url,
+    upvote_count,
+    created_at
+  )
 values
   (
     '6d754120-b79f-4467-970f-0dabba18bb4f',
     'Apu Nahasapeemapetilon',
     'Pardon me, but I would like to see this money spent on police officers. I have been shot eight times this year, and as a result, I almost missed work.',
     '/images/apu.png',
-    0
+    0,
+    '2022-07-24 13:57:56.681757+00'
   );
 
 insert into
-  comments (id, users_name, body, avatar_url, upvote_count)
+  comments (
+    id,
+    users_name,
+    body,
+    avatar_url,
+    upvote_count,
+    created_at
+  )
 values
   (
     '3da49b17-1a1a-4f36-a697-7ce720123efa',
     'Clancy Wiggum',
     'Crybaby!',
     '/images/wiggums.jpg',
-    6
+    3,
+    '2022-07-24 14:57:56.681757+00'
+  );
+
+insert into
+  upvotes (comment_id, users_name)
+values
+  (
+    '3da49b17-1a1a-4f36-a697-7ce720123efa',
+    'Stranger 1'
+  );
+
+insert into
+  upvotes (comment_id, users_name)
+values
+  (
+    '3da49b17-1a1a-4f36-a697-7ce720123efa',
+    'Stranger 2'
+  );
+
+insert into
+  upvotes (comment_id, users_name)
+values
+  (
+    '3da49b17-1a1a-4f36-a697-7ce720123efa',
+    'Stranger 3'
   );
