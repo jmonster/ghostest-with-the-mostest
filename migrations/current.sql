@@ -19,7 +19,7 @@ values
   (
     'e2781ebc-20a0-4f7f-b6b3-6ef00a1462f8',
     'Mr. Snrub',
-    'Anyway, I-- I say we invest that money back in the nuclear plant.',
+    'I-- I say we invest that money back in the nuclear plant.',
     '/images/snrub.webp',
     2
   );
