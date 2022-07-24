@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="/stylesheets/style.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
+    const API = "http://localhost:3000"
+
     // i.e. $(document).ready(() => {})
     // compliments of https://stackoverflow.com/a/9899701
     function docReady(fn) {
@@ -54,8 +56,9 @@
       // TODO pick a random users_name/avatar from a set
       const users_name = `AnonymousUser#${Math.floor(Math.random()*10)}`
       const avatar_url = "https://avatars.githubusercontent.com/u/368767?v=4"
+      const comments = await (await fetch(`${API}/comments`)).json()
+      // TODO scope comments under different discussions instead of one global
 
-      // Each page/document/context/whatever has a unique "rootCategory" that all messages are nested/scoped under
       // render html blobs for each comment
       const commentElements = comments.map(htmlFromData)
 
@@ -69,10 +72,26 @@
         const comment = document.getElementById('new-comment-input').value
         if (comment.length === 0) return;
 
-        const html = htmlFromData({ users_name, avatar_url, created_at: "a while ago", body: comment })
+        const html = htmlFromData({ users_name, avatar_url, created_at: "just now", body: comment })
         commentsParent.appendChild(htmlToElement(html))
         document.getElementById('new-comment-input').value = ""
+
+        const body = JSON.stringify({users_name, avatar_url, body: comment, path: ''})
+        const newPostResponse = await fetch(`${API}/comments/new`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': "application/json"
+          },
+          body
+        });
+
+        if (newPostResponse.status !== 201) {
+          throw new Error('Unexpected response from server.')
+        }
       }
+    
+      // TODO subscribe to notifications for new comments
+      // https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
     });
   </script>
 </head>
