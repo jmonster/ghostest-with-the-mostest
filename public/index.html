@@ -78,9 +78,16 @@
 
     docReady(async function () {
       // choose a random users_name on each page load
-      // TODO pick a random users_name/avatar from a set
-      const users_name = `AnonymousUser#${Math.floor(Math.random()*10)}`
-      const avatar_url = "https://avatars.githubusercontent.com/u/368767?v=4"
+      const anonymousUsers = [
+        {name: 'Lisa Simpson', avatar: '/images/lisa.jpg'},
+        {name: 'Bart Simpson', avatar: '/images/bart.jpg'},
+        {name: 'Marge Simpson', avatar: '/images/marge.jpg'},
+        {name: 'Homer Simpson', avatar: '/images/homer.jpg'},
+      ]
+      const randomIdx = Math.floor(Math.random()*anonymousUsers.length)
+      const users_name = anonymousUsers[randomIdx].name
+      const avatar_url = anonymousUsers[randomIdx].avatar
+
       const comments = await (await fetch(`${API}/comments`)).json()
       // TODO scope comments under different discussions instead of one global
 
