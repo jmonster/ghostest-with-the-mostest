@@ -90,6 +90,10 @@ docReady(async function () {
   const users_name = anonymousUsers[randomIdx].name;
   const avatar_url = anonymousUsers[randomIdx].avatar;
 
+  document
+    .getElementById("anonymous-user-avatar")
+    .setAttribute("src", avatar_url);
+
   const comments = await (await fetch(`${API}/comments`)).json();
   // TODO scope comments under different discussions instead of one global
 
