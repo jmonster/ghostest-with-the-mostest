@@ -29,7 +29,7 @@ async function submitUpvote(id) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ id }),
+    body: JSON.stringify({ id, users_name: window.currentUser.users_name }),
   });
 
   if (response.status > 299) {
@@ -89,6 +89,8 @@ docReady(async function () {
   const randomIdx = Math.floor(Math.random() * anonymousUsers.length);
   const users_name = anonymousUsers[randomIdx].name;
   const avatar_url = anonymousUsers[randomIdx].avatar;
+
+  window.currentUser = { users_name, avatar_url };
 
   document
     .getElementById("anonymous-user-avatar")

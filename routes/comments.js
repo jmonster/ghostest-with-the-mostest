@@ -44,15 +44,29 @@ router.post("/comments/new", async function (req, res) {
 });
 
 router.post("/comments/upvote", async function (req, res) {
-  // TODO prevent the same user from upvoting the same comment more than once
+  const comment_id = req.body.id;
+  const users_name = req.body.users_name;
 
-  const commentId = req.body.id;
-  await pg.raw(
-    `UPDATE comments SET upvote_count = upvote_count + 1 WHERE id = ?`,
-    commentId
-  );
+  await pg.transaction(async function (trx) {
+    try {
+      await Promise.all([
+        trx("upvotes").insert({
+          comment_id,
+          users_name,
+        }),
 
-  res.sendStatus(204);
+        trx.raw(
+          `UPDATE comments SET upvote_count = upvote_count + 1 WHERE id = ?`,
+          comment_id
+        ),
+      ]);
+
+      res.sendStatus(204);
+    } catch (err) {
+      // TODO handle different types of errors, notify the user, etc
+      res.sendStatus(409); // 409 Conflict, or should it be 422 Unprocessable Entity?
+    }
+  });
 });
 
 module.exports = router;

@@ -1,15 +1,26 @@
 -- Enter migration here
 DROP TABLE
+  IF EXISTS upvotes CASCADE;
+
+DROP TABLE
   IF EXISTS comments CASCADE;
 
 CREATE TABLE
   comments(
-    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     users_name VARCHAR(128) NOT NULL,
     avatar_url VARCHAR(512),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     body VARCHAR(280) NOT NULL,
     upvote_count INT4 DEFAULT 0 NOT NULL
+  );
+
+-- upvote table ensures that a user may only upvote each comment once
+CREATE TABLE
+  upvotes(
+    comment_id UUID REFERENCES comments(id) NOT NULL,
+    users_name VARCHAR(128) NOT NULL,
+    UNIQUE (comment_id, users_name)
   );
 
 -- Initial seed data for demonstration
