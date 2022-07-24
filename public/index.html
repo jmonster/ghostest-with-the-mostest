@@ -106,7 +106,7 @@
         const comment = document.getElementById('new-comment-input').value
         if (comment.length === 0) return;
 
-        const html = htmlFromData({ users_name, avatar_url, created_at: "just now", body: comment })
+        const html = htmlFromData({ users_name, avatar_url, created_at: Date.now(), body: comment })
         commentsParent.appendChild(htmlToElement(html))
         document.getElementById('new-comment-input').value = ""
 
