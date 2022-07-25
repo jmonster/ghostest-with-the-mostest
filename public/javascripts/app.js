@@ -50,16 +50,12 @@ async function submitUpvote(id) {
   }
 
   // update local UI to reflect change
-  // note: each element has an id like "upvote_count('6d754120-b79f-4467-970f-0dabba18bb4f')"
-  const el = document.getElementById(`upvote_count(${id})`);
-
-  // TODO refactor this to use data attributes
-  // see https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes
-  // use a regex to extract the previous count
-  const prevValue = el.innerHTML.match(/\((\d+)\)/);
+  // note: each element has an id of the form "btn-upvote-6d754120-b79f-4467-970f-0dabba18bb4f"
+  const el = document.getElementById(`btn-upvote-${id}`);
+  const prevValue = +el.getAttribute("data-upvotes");
 
   // update the ui to reflect the new value
-  el.innerHTML = prevValue ? `(${parseInt(prevValue[1], 10) + 1})` : "(1)";
+  el.innerHTML = prevValue ? `(${prevValue + 1})` : "(1)";
 }
 
 // render data into an template
@@ -71,6 +67,8 @@ function htmlFromData({
   body,
   upvote_count,
 }) {
+  const renderedUpvoteCount = upvote_count > 0 ? `(${upvote_count})` : "";
+
   return `
     <div class="flex flex-row my-4">
       <img src="${avatar_url}" class="rounded-full w-12 h-12 mr-4" />
@@ -87,9 +85,7 @@ function htmlFromData({
             id ? `onclick="submitUpvote('${id}')"` : ""
           }>
             <span class="mr-1"">▲</span>
-            <span>Upvote <span id="upvote_count(${id})">${
-    upvote_count > 0 ? `(${upvote_count})` : ""
-  }</span></span>
+            <span>Upvote <span id="btn-upvote-${id}" data-upvotes="${upvote_count}">${renderedUpvoteCount}</span></span>
           </span>
           <span>Reply</span>
         </div>
