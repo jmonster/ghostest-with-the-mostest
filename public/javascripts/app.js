@@ -39,7 +39,11 @@ async function submitUpvote(id) {
     body: JSON.stringify({ id, users_name: window.currentUser.users_name }),
   });
 
-  if (response.status > 299) {
+  if (response.status === 409) {
+    return alert(
+      `You (${window.currentUser.users_name}) may only upvote each comment once.`
+    );
+  } else if (response.status > 299) {
     throw new Error(
       `Failed to upvote due to network error: ${response.status} ${response.statusText}`
     );
