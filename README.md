@@ -18,3 +18,5 @@ npm run start
 - avoid global javascript (e.g. RelativeTime)
 - "upvotes" table should use logged in user's uuid (instead of users_name)
 - don't rely on client/server code to keep the DB consistent; use an on-create hook to increment the value in the "comments" table or consider other strategies
+- minify app.js
+- store fields (such as vote counts) on data attributes rather than encoding it in the element's id/class fields

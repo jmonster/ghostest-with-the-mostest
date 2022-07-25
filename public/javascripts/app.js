@@ -1,8 +1,9 @@
-const API = "http://localhost:3000";
-const relativeTime = new RelativeTime();
-// i.e. $(document).ready(() => {})
+const API = "http://localhost:3000"; // url of the server managing comments and upvotes
+const relativeTime = new RelativeTime(); // a Date formatting library
+
+// onDocumentReady -- executes the passed-in function (fn) when the DOM is ready
 // compliments of https://stackoverflow.com/a/9899701
-function docReady(fn) {
+function onDocumentReady(fn) {
   // see if DOM is already available
   if (
     document.readyState === "complete" ||
@@ -15,6 +16,8 @@ function docReady(fn) {
   }
 }
 
+// htmlToElement -- converts an HTML string to a DOM element
+// caveat: returns only the first node
 // compliments of https://stackoverflow.com/a/35385518
 function htmlToElement(html) {
   var template = document.createElement("template");
@@ -23,6 +26,10 @@ function htmlToElement(html) {
   return template.content.firstChild;
 }
 
+function incrementUpvoteCount(id) {}
+
+// submits upvote to the server
+// on success, updates the UI to reflect the new value
 async function submitUpvote(id) {
   const response = await fetch(`${API}/comments/upvote`, {
     method: "POST",
@@ -39,11 +46,19 @@ async function submitUpvote(id) {
   }
 
   // update local UI to reflect change
+  // note: each element has an id like "upvote_count('6d754120-b79f-4467-970f-0dabba18bb4f')"
   const el = document.getElementById(`upvote_count(${id})`);
+
+  // TODO refactor this to use data attributes
+  // see https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes
+  // use a regex to extract the previous count
   const prevValue = el.innerHTML.match(/\((\d+)\)/);
+
+  // update the ui to reflect the new value
   el.innerHTML = prevValue ? `(${parseInt(prevValue[1], 10) + 1})` : "(1)";
 }
 
+// render data into an template
 function htmlFromData({
   id,
   users_name,
@@ -78,8 +93,8 @@ function htmlFromData({
     </div>`;
 }
 
-docReady(async function () {
-  // choose a random users_name on each page load
+onDocumentReady(async function () {
+  // select a random user on each page load
   const anonymousUsers = [
     { name: "Lisa Simpson", avatar: "/images/lisa.jpg" },
     { name: "Bart Simpson", avatar: "/images/bart.jpg" },
@@ -89,62 +104,68 @@ docReady(async function () {
   const randomIdx = Math.floor(Math.random() * anonymousUsers.length);
   const users_name = anonymousUsers[randomIdx].name;
   const avatar_url = anonymousUsers[randomIdx].avatar;
-
   window.currentUser = { users_name, avatar_url };
 
+  // display the current user's avatar
   document
     .getElementById("anonymous-user-avatar")
     .setAttribute("src", avatar_url);
 
-  const comments = await (await fetch(`${API}/comments`)).json();
-  // TODO scope comments under different discussions instead of one global
+  // fetch comments from the server
+  const commentsAsJSON = await (await fetch(`${API}/comments`)).json();
 
   // render html blobs for each comment
-  const commentElements = comments.map(htmlFromData);
+  const commentsAsHtml = commentsAsJSON.map(htmlFromData);
 
   // add them to the DOM
   const commentsParent = window.document.getElementById("comments");
-  commentElements.forEach((el) =>
-    commentsParent.appendChild(htmlToElement(el))
-  );
+  commentsAsHtml.forEach((el) => commentsParent.appendChild(htmlToElement(el)));
 
   async function submitNewComment() {
     const comment = document.getElementById("new-comment-input").value;
-    if (comment.length === 0) return;
+    if (comment.length === 0) return; // skip empty comments
 
-    const html = htmlFromData({
+    const commentAsHTML = htmlFromData({
       users_name,
       avatar_url,
       created_at: Date.now(),
       body: comment,
     });
-    commentsParent.appendChild(htmlToElement(html));
+    const commentElement = htmlToElement(commentAsHTML);
+
+    // add comment to DOM
+    commentsParent.appendChild(commentElement);
+
+    // reset new comment's input field to blank
     document.getElementById("new-comment-input").value = "";
 
-    const body = JSON.stringify({
-      users_name,
-      avatar_url,
-      body: comment,
-      path: "",
-    });
+    // submit the comment and it's metadata
+    // note: in a real system, some of these fields would be derived
+    //       server-side from the logged in user's session
     const newPostResponse = await fetch(`${API}/comments/new`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body,
+      body: JSON.stringify({
+        users_name,
+        avatar_url,
+        body: comment,
+        path: "",
+      }),
     });
 
+    // consider non-201 responses as errors
     if (newPostResponse.status !== 201) {
       throw new Error("Unexpected response from server.");
     }
   }
 
-  // wire-up comment submit button
+  // listen for submit button clicks
   const submitBtn = document.getElementById("submitCommentBtn");
   submitBtn.onclick = submitNewComment;
 
-  // post comment when the user presses Enter/Return
+  // listen for Enter/Return key while composing a comment
   document.getElementById("new-comment-input").onkeyup = ({ code }) => {
     if (code === "Enter") submitNewComment();
   };
