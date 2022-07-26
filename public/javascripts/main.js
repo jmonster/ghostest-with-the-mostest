@@ -26,40 +26,8 @@ function htmlToElement(html) {
   return template.content.firstChild;
 }
 
-function incrementUpvoteCount(id) {}
-
-// submits upvote to the server
-// on success, updates the UI to reflect the new value
-async function submitUpvote(id) {
-  const response = await fetch(`${API}/comments/upvote`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ id, users_name: window.currentUser.users_name }),
-  });
-
-  if (response.status === 409) {
-    return alert(
-      `You (${window.currentUser.users_name}) may only upvote each comment once.`
-    );
-  } else if (response.status > 299) {
-    throw new Error(
-      `Failed to upvote due to network error: ${response.status} ${response.statusText}`
-    );
-  }
-
-  // update local UI to reflect change
-  // note: each element has an id of the form "btn-upvote-6d754120-b79f-4467-970f-0dabba18bb4f"
-  const el = document.getElementById(`btn-upvote-${id}`);
-  const prevValue = +el.getAttribute("data-upvotes");
-
-  // update the ui to reflect the new value
-  el.innerHTML = prevValue ? `(${prevValue + 1})` : "(1)";
-}
-
 // render data into an template
-function htmlFromData({
+function commentHtmlFromData({
   id,
   users_name,
   avatar_url,
@@ -67,8 +35,6 @@ function htmlFromData({
   body,
   upvote_count,
 }) {
-  const renderedUpvoteCount = upvote_count > 0 ? `(${upvote_count})` : "";
-
   return `
     <div class="flex flex-row my-4">
       <img src="${avatar_url}" class="rounded-full w-12 h-12 mr-4" />
@@ -80,13 +46,8 @@ function htmlFromData({
           )}</span>
         </div>
         <p class="darker-blue my-1">${body}</p>
-        <div class="font-bold dark-blue text-xs my-4">
-          <span class="mr-2" role="button" ${
-            id ? `onclick="submitUpvote('${id}')"` : ""
-          }>
-            <span class="mr-1"">▲</span>
-            <span>Upvote <span id="btn-upvote-${id}" data-upvotes="${upvote_count}">${renderedUpvoteCount}</span></span>
-          </span>
+        <div class="flex font-bold dark-blue text-xs my-4">
+          <div class="upvote-button-container" data-upvotes="${upvote_count}" data-commentid="${id}"></div>
           <span>Reply</span>
         </div>
       </div>
@@ -115,17 +76,29 @@ onDocumentReady(async function () {
   const commentsAsJSON = await (await fetch(`${API}/comments`)).json();
 
   // render html blobs for each comment
-  const commentsAsHtml = commentsAsJSON.map(htmlFromData);
+  const commentsAsHtml = commentsAsJSON.map(commentHtmlFromData);
 
   // add them to the DOM
   const commentsParent = window.document.getElementById("comments");
-  commentsAsHtml.forEach((el) => commentsParent.appendChild(htmlToElement(el)));
+  commentsAsHtml.forEach((html) => {
+    // convert an html string to a DOM element
+    const element = htmlToElement(html);
+    // add comment element to the page
+    commentsParent.appendChild(element);
+
+    // UpvoteButton is a React Component defined in "public/javascripts/upvote-button.js"
+    // and we're rendering it into the Comment element created above
+    const btn = element.querySelector(".upvote-button-container");
+    const { commentid, upvotes } = btn.dataset; // Read from the data-* attributes
+    const root = ReactDOM.createRoot(btn);
+    root.render(e(UpvoteButton, { commentid, upvotes }));
+  });
 
   async function submitNewComment() {
     const comment = document.getElementById("new-comment-input").value;
     if (comment.length === 0) return; // skip empty comments
 
-    const commentAsHTML = htmlFromData({
+    const commentAsHTML = commentHtmlFromData({
       users_name,
       avatar_url,
       created_at: Date.now(),

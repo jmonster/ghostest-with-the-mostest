@@ -19,6 +19,7 @@ npm start
 - "upvotes" table should use logged in user's uuid (instead of users_name)
 - don't rely on client/server code to keep the DB consistent; use an on-create hook to increment the value in the "comments" table or consider other strategies
 - minify `public/javascripts/app.js`
+- indicate which comments have already been liked by the current user
 
 ## Preview
 
