@@ -5,11 +5,18 @@ const e = React.createElement;
 class UpvoteButton extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      commentid: props.commentid,
+      commentID: props.commentID,
       upvotes: +props.upvotes, // total number of upvotes for the comment
       upvotePending: false, // true during the brief period between a user clicking the button and the server responding
     };
+
+    // register our interest in notifications for the given commentID
+    props.requestNotificationOnUpvote(this.state.commentID, (upvotes) => {
+      // update the upvote count to match what was sent by the server
+      this.setState({ upvotes });
+    });
   }
 
   // persists upvotes to the server
@@ -20,7 +27,7 @@ class UpvoteButton extends React.Component {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: this.state.commentid,
+        id: this.state.commentID,
         users_name: window.currentUser.users_name,
       }),
     });
@@ -48,13 +55,15 @@ class UpvoteButton extends React.Component {
         className: `mr-8 ${this.state.upvotePending ? "text-neutral-300" : ""}`,
         disabled: this.state.upvotePending,
         onClick: async () => {
-          this.setState({
-            upvotePending: true,
-          });
+          this.setState({ upvotePending: true });
 
           try {
             await this.submitUpvote();
-            this.setState({ upvotes: this.state.upvotes + 1 });
+
+            // The UI will be updated by the broadcast message that is reflected back from the server.
+            // Mutating this value here would add a bit more code/complexity
+            //
+            // ...it's a UX improvement for V3 :)
           } catch (err) {
             console.error(err);
           } finally {

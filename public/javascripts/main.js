@@ -1,5 +1,6 @@
 const API = "http://localhost:3000"; // url of the server managing comments and upvotes
 const relativeTime = new RelativeTime(); // a Date formatting library
+const commentSubscribers = {};
 
 // onDocumentReady -- executes the passed-in function (fn) when the DOM is ready
 // compliments of https://stackoverflow.com/a/9899701
@@ -54,6 +55,10 @@ function commentHtmlFromData({
     </div>`;
 }
 
+function requestNotificationOnUpvote(commentID, signaler) {
+  commentSubscribers[commentID] = signaler;
+}
+
 onDocumentReady(async function () {
   // select a random user on each page load
   const anonymousUsers = [
@@ -75,6 +80,15 @@ onDocumentReady(async function () {
   // fetch comments from the server
   const commentsAsJSON = await (await fetch(`${API}/comments`)).json();
 
+  // listen for new comments
+  const commentSource = new EventSource("/comments/broadcast");
+  commentSource.addEventListener("message", ({ data }) => {
+    // TODO validate data
+    const { upvoteCount, commentID } = JSON.parse(data);
+    const signaler = commentSubscribers[commentID];
+    if (signaler) commentSubscribers[commentID](upvoteCount);
+  });
+
   // render html blobs for each comment
   const commentsAsHtml = commentsAsJSON.map(commentHtmlFromData);
 
@@ -91,7 +105,13 @@ onDocumentReady(async function () {
     const btn = element.querySelector(".upvote-button-container");
     const { commentid, upvotes } = btn.dataset; // Read from the data-* attributes
     const root = ReactDOM.createRoot(btn);
-    root.render(e(UpvoteButton, { commentid, upvotes }));
+    root.render(
+      e(UpvoteButton, {
+        commentID: commentid,
+        upvotes,
+        requestNotificationOnUpvote,
+      })
+    );
   });
 
   async function submitNewComment() {

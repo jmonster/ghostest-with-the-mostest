@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router();
 
+const clients = new Set();
+
 if (!process.env.DATABASE_URL) {
   console.error("Missing environment variable: DATABASE_URL");
   process.exit(1);
@@ -52,7 +54,7 @@ router.post("/comments/upvote", async function (req, res) {
 
   await pg.transaction(async function (trx) {
     try {
-      await Promise.all([
+      const result = await Promise.all([
         // create the unique record (comment_id, users_name)
         trx("upvotes").insert({
           comment_id,
@@ -60,19 +62,50 @@ router.post("/comments/upvote", async function (req, res) {
         }),
 
         // update cached upvote count property
-        // TODO consider a DB function that automatically maintains this property
-        //      and removes the need for a transaction
+        // TODO consider a DB function that automatically maintains this property and removes the need for a transaction
         trx.raw(
-          `UPDATE comments SET upvote_count = upvote_count + 1 WHERE id = ?`,
+          `UPDATE comments SET upvote_count = upvote_count + 1 WHERE id = ? RETURNING upvote_count`,
           comment_id
         ),
       ]);
 
       res.sendStatus(204);
+
+      // broadcast this change to all connected clients
+      const data = {
+        upvoteCount: result[1].rows[0].upvote_count,
+        commentID: comment_id,
+      };
+      const message = `data: ${JSON.stringify(data)}`;
+      clients.forEach((client) => client.response.write(`${message}\n\n`));
     } catch (err) {
+      console.error(err);
       // TODO handle different types of errors, notify the user, etc
       res.sendStatus(409); // 409 Conflict, or should it be 422 Unprocessable Entity?
     }
+  });
+});
+
+router.get("/comments/broadcast", async function (req, res) {
+  res.set({
+    "Cache-Control": "no-cache",
+    "Content-Type": "text/event-stream",
+    Connection: "keep-alive",
+  });
+  res.flushHeaders();
+
+  const clientId = Date.now(); // TODO switch to guids to avoid collisons
+  const newClient = {
+    id: clientId,
+    response: res,
+  };
+
+  // add to collection to be notified
+  clients.add(newClient);
+
+  // cleanup client on disconnect
+  req.once("close", () => {
+    clients.delete(newClient);
   });
 });
 
