@@ -2,8 +2,16 @@
 
 ## Pre-requisites
 
+### when using the preconfigured database
+
 - [Node.JS](https://nodejs.org/en/) (and npm) must be installed
-- An active internet connection (unless specifying a local DB)
+
+### when rolling your own database
+
+- [Node.JS](https://nodejs.org/en/) (and npm) must be installed
+- PostgreSQL's [ltree extension](https://www.postgresql.org/docs/current/ltree.html) must be installed and enabled; see [this helpful blog](https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension) for instructions
+- [Graphile Migrate](https://github.com/graphile/migrate) must be setup on the DB and the migrations run
+- Update `.env` to appropriate values
 
 ## How to run
 
