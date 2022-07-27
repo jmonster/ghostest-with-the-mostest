@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const collectNestedRecords = require("../lib/collect-nested-records");
 
 const clients = new Set();
 
@@ -23,7 +24,8 @@ router.get("/comments", async function (req, res) {
     .orderBy("created_at", "asc")
     .limit(1000);
 
-  return res.send(comments);
+  const nestedComments = collectNestedRecords(comments);
+  return res.send(nestedComments);
 });
 
 router.post("/comments/new", async function (req, res) {

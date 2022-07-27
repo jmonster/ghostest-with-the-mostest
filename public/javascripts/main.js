@@ -28,34 +28,47 @@ function htmlToElement(html) {
 }
 
 // render data into an template
-function commentHtmlFromData({
-  id,
-  path,
-  users_name,
-  avatar_url,
-  created_at,
-  body,
-  upvote_count,
-}) {
+function commentHtmlFromData(
+  {
+    id,
+    path,
+    users_name,
+    avatar_url,
+    created_at,
+    body,
+    upvote_count,
+    children,
+  },
+  depth
+) {
+  const nestedComments = children.map((child) =>
+    commentHtmlFromData(child, depth + 1)
+  );
+
   return {
     id,
     path,
     html: `
-    <div class="flex flex-row my-4">
-      <img src="${avatar_url}" class="rounded-full w-12 h-12 mr-4" />
-      <div class="flex flex-col flex-auto">
-        <div class="flex items-center">
-          <span class="darker-blue font-bold">${users_name}</span>
-          <span class="dark-blue font-light text-sm">・${relativeTime.from(
-            new Date(created_at)
-          )}</span>
+    <div class="flex flex-col">
+      <div class="flex flex-row my-4">
+        <img src="${avatar_url}" class="rounded-full w-12 h-12 mr-4 z-10" />
+        <div class="flex flex-col flex-auto ${
+          children.length > 0 ? "border-l-2 -ml-10 pl-16" : ""
+        }">
+          <div class="flex items-center">
+            <span class="darker-blue font-bold">${users_name}</span>
+            <span class="dark-blue font-light text-sm">・${relativeTime.from(
+              new Date(created_at)
+            )}</span>
+          </div>
+          <p class="darker-blue my-1">${body}</p>
+          <div class="flex font-bold dark-blue text-xs my-4">
+            <div class="upvote-button-container" data-upvotes="${upvote_count}" data-commentid="${id}"></div>
+            <button class="reply-toggle-button">Reply</button>
+          </div>
+          <div class="reply-composer-container"></div>
+          ${nestedComments.reduce((acc, next) => acc + next.html, "")}
         </div>
-        <p class="darker-blue my-1">${body}</p>
-        <div class="flex font-bold dark-blue text-xs my-4">
-          <div class="upvote-button-container" data-upvotes="${upvote_count}" data-commentid="${id}"></div>
-          <button class="reply-toggle-button">Reply</button>
-        </div>
-        <div class="reply-composer-container"></div>
       </div>
     </div>`,
   };
@@ -96,7 +109,9 @@ onDocumentReady(async function () {
   });
 
   // render html blobs for each comment
-  const commentsAsHtml = commentsAsJSON.map(commentHtmlFromData);
+  const commentsAsHtml = commentsAsJSON.map((json) => {
+    return commentHtmlFromData(json, 0);
+  });
 
   // add them to the DOM
   const commentsParent = window.document.getElementById("comments");
@@ -143,10 +158,11 @@ onDocumentReady(async function () {
           }),
         });
 
-        // TODO append the new comment to `element`
         const data = await newPostResponse.json();
         data.created_at = new Date(data.created_at);
-        const { html: newCommentAsHtml } = commentHtmlFromData(data);
+
+        // we know there can be only 1 result from 'commentHtmlFromData'
+        const [{ html: newCommentAsHtml }] = commentHtmlFromData(data, 0);
         const newCommentAsElement = htmlToElement(newCommentAsHtml);
         element.after(newCommentAsElement);
 
@@ -191,12 +207,16 @@ onDocumentReady(async function () {
     const comment = document.getElementById("new-comment-input").value;
     if (comment.length === 0) return; // skip empty comments
 
-    const { html: commentAsHTML } = commentHtmlFromData({
-      users_name,
-      avatar_url,
-      created_at: Date.now(),
-      body: comment,
-    });
+    const { html: commentAsHTML } = commentHtmlFromData(
+      {
+        users_name,
+        avatar_url,
+        created_at: Date.now(),
+        body: comment,
+      },
+      0
+    );
+
     const commentElement = htmlToElement(commentAsHTML);
     // add comment to DOM
     commentsParent.appendChild(commentElement);
@@ -222,6 +242,7 @@ onDocumentReady(async function () {
 
     // consider non-201 responses as errors
     if (newPostResponse.status !== 201) {
+      // TODO cleanup UI
       throw new Error("Unexpected response from server.");
     }
   }
