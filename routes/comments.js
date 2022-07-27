@@ -39,7 +39,15 @@ router.post("/comments/new", async function (req, res) {
 
   // persist this new comment
   const result = await pg("comments")
-    .returning(["id", "users_name", "avatar_url", "body", "path", "created_at"])
+    .returning([
+      "id",
+      "users_name",
+      "avatar_url",
+      "body",
+      "path",
+      "created_at",
+      "upvote_count",
+    ])
     .insert({
       id: uuid,
       users_name,

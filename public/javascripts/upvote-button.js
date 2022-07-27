@@ -7,13 +7,14 @@ class UpvoteButton extends React.Component {
     super(props);
 
     this.state = {
-      commentID: props.commentID,
+      api: props.api,
+      commentID: props.commentID, // guid
       upvotes: +props.upvotes, // total number of upvotes for the comment
       upvotePending: false, // true during the brief period between a user clicking the button and the server responding
     };
 
     // register our interest in notifications for the given commentID
-    props.requestNotificationOnUpvote(this.state.commentID, (upvotes) => {
+    props.registerForNotificationOnUpvote(this.state.commentID, (upvotes) => {
       // update the upvote count to match what was sent by the server
       this.setState({ upvotes });
     });
@@ -21,7 +22,7 @@ class UpvoteButton extends React.Component {
 
   // persists upvotes to the server
   async submitUpvote() {
-    const response = await fetch(`${API}/comments/upvote`, {
+    const response = await fetch(`${this.state.api}/comments/upvote`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
