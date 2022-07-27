@@ -33,19 +33,23 @@ router.post("/comments/new", async function (req, res) {
   const {
     rows: [{ uuid_generate_v4: uuid }],
   } = await pg.raw("select uuid_generate_v4();"); // let PG generate a uuid (vs installing another dependency)
+  const uuidWithoutDashes = uuid.replace(/-/g, ""); // ltree won't accept dashes in the path
 
   // persist this new comment
-  await pg("comments").insert({
-    id: uuid,
-    users_name,
-    avatar_url,
-    body,
-  });
+  const result = await pg("comments")
+    .returning(["id", "users_name", "avatar_url", "body", "path", "created_at"])
+    .insert({
+      id: uuid,
+      users_name,
+      avatar_url,
+      body,
+      path: parentPath
+        ? `${parentPath}.${uuidWithoutDashes}`
+        : uuidWithoutDashes, // append this comment's ID as the next node in the path
+    });
 
-  // TODO handle errors gracefully
-  // TODO broadcast this new comment to all connected clients
-
-  res.sendStatus(201);
+  if (result.length < 1) return res.sendStatus(500);
+  res.send(result[0]);
 });
 
 router.post("/comments/upvote", async function (req, res) {
