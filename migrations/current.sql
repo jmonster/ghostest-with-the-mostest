@@ -1,4 +1,8 @@
 -- Enter migration here
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE EXTENSION IF NOT EXISTS "ltree";
+
 DROP TABLE
   IF EXISTS upvotes CASCADE;
 
@@ -55,6 +59,15 @@ values
   );
 
 insert into
+  upvotes (comment_id, users_name)
+values
+  (
+    'e2781ebc-20a0-4f7f-b6b3-6ef00a1462f8',
+    'Mr. Snrub'
+  );
+
+-- nested under Snrub's comment
+insert into
   comments (
     id,
     users_name,
@@ -104,6 +117,7 @@ values
     '6d754120b79f4467970f0dabba18bb4f'
   );
 
+-- nested under Apu's comment
 insert into
   comments (
     id,
