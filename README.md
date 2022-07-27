@@ -31,4 +31,4 @@ npm start
 
 ## Preview
 
-<img width="688" alt="image" src="https://user-images.githubusercontent.com/368767/180865643-cac66031-f1fc-4b43-a2b2-23d71f9b99e1.png">
+<img width="1051" alt="image" src="https://user-images.githubusercontent.com/368767/181362524-d30fafab-9355-42ee-8dd8-db9f14b44435.png">
