@@ -2,7 +2,7 @@
   const API = "http://localhost:3000"; // url of the server managing comments and upvotes
   const relativeTime = new RelativeTime(); // a Date formatting library
   const commentSubscribers = {};
-  const threadedIndicatorClass = "border-l-2 -ml-10 pl-16";
+  const threadedIndicatorClass = "border-l-2 -ml-10 pl-10";
   const anonymousUsers = [
     { name: "Lisa Simpson", avatar: "/images/lisa.jpg" },
     { name: "Bart Simpson", avatar: "/images/bart.jpg" },
@@ -44,10 +44,10 @@
   ) {
     const relativeTimeAgo = relativeTime.from(new Date(created_at));
     const html = `
-    <div class="flex flex-col sub-comment ${isRoot ? "my-4" : ""}">
+    <div class="flex flex-col sub-comment mt-6 ">
       <div class="flex flex-row">
-        <img src="${avatar_url}" class="rounded-full w-12 h-12 mr-4 z-10 bg-white" />
-        <div class="flex flex-col flex-auto threaded mb-4 ${
+        <img src="${avatar_url}" class="rounded-full w-10 h-10 mr-4 z-10 bg-white" />
+        <div class="flex flex-col flex-auto threaded ${
           hasChildren ? threadedIndicatorClass : ""
         }">
           <div class="flex items-center">
@@ -55,7 +55,7 @@
             <span class="dark-blue font-light text-sm">・${relativeTimeAgo}</span>
           </div>
           <p class="darker-blue my-1">${body}</p>
-          <div class="flex font-bold dark-blue text-xs my-4">
+          <div class="flex font-bold dark-blue text-xs mt-2">
             <div class="upvote-button-container" data-upvotes="${upvote_count}" data-commentid="${id}"></div>
             ${
               // note: remove this conditional to support arbitrarly nested Replies
