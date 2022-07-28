@@ -29,7 +29,7 @@
   // caveat: returns only the first node
   // compliments of https://stackoverflow.com/a/35385518
   function htmlToElement(html, depth) {
-    var template = document.createElement("template");
+    const template = document.createElement("template");
     html = html.trim(); // Never return a text node of whitespace as the result
     template.innerHTML = html;
     return template.content.firstChild;

@@ -1,11 +1,11 @@
 require("dotenv").config();
 
-var express = require("express");
-var path = require("path");
-var logger = require("morgan");
-var commentsRouter = require("./routes/comments");
+const express = require("express");
+const path = require("path");
+const logger = require("morgan");
+const commentsRouter = require("./routes/comments");
 
-var app = express();
+const app = express();
 
 app.use(logger("dev"));
 app.use(express.json());
