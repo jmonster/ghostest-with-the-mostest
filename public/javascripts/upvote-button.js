@@ -49,6 +49,8 @@ class UpvoteButton extends React.Component {
 
   render() {
     const triangleIcon = e("span", { className: "mr-1" }, "▲");
+    const text =
+      this.state.upvotes > 0 ? `Upvote (${this.state.upvotes})` : "Upvote";
 
     return e(
       "button",
@@ -73,7 +75,7 @@ class UpvoteButton extends React.Component {
         },
       },
       triangleIcon,
-      `Upvote (${this.state.upvotes})`
+      text
     );
   }
 }
