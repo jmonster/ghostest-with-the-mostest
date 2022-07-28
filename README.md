@@ -2,16 +2,16 @@
 
 ## Pre-requisites
 
-### when using the preconfigured database
+### easy -- using the preconfigured database
 
 - [Node.JS](https://nodejs.org/en/) (and npm) must be installed
 
-### when rolling your own database
+### less easy -- rolling your own database
 
 - [Node.JS](https://nodejs.org/en/) (and npm) must be installed
-- PostgreSQL's [ltree extension](https://www.postgresql.org/docs/current/ltree.html) must be installed and enabled; see [this helpful blog](https://patshaughnessy.net/2017/12/12/installing-the-postgres-ltree-extension) for instructions
-- [Graphile Migrate](https://github.com/graphile/migrate) must be setup on the DB and the migrations run
+- PostgreSQL's [ltree extension](https://www.postgresql.org/docs/current/ltree.html) and [uuid-osp](https://www.postgresql.org/docs/current/uuid-ossp.html) extensions must be installed in the DB
 - Update `.env` to appropriate values
+- Run `graphile-migrate watch` in addition to `npm start`; see [Graphile Migrate](https://github.com/graphile/migrate) for more information
 
 ## How to run
 
@@ -20,15 +20,16 @@ npm install
 npm start
 ```
 
-## Things that should change
+## Future improvements
 
 - use a built/pruned version of Tailwindcss
 - avoid global javascript (e.g. RelativeTime)
-- "upvotes" table should use logged in user's uuid (instead of users_name)
-- don't rely on client/server code to keep the DB consistent; use an on-create hook to increment the value in the "comments" table or consider other strategies
+- the "upvotes" table should use the logged in user's _uuid_ (rather than _users_name_)
+- shouldn't rely on client/server code to keep the DB consistent; use an on-create hook to increment the value in the "comments" table or consider other strategies to cache this value
 - minify `public/javascripts/app.js`
-- indicate which comments have already been liked by the current user
+- indicate which comments have already been liked by the current user using color
+- pagination and/or lazy-loading for longer comment threads
 
 ## Preview
 
-<img width="1051" alt="image" src="https://user-images.githubusercontent.com/368767/181362524-d30fafab-9355-42ee-8dd8-db9f14b44435.png">
+<img width="1092" alt="image" src="https://user-images.githubusercontent.com/368767/181626523-aa01449d-524f-480b-9766-20ce5caabeda.png">
