@@ -1,5 +1,5 @@
 (function () {
-  const API = "http://localhost:3000"; // url of the server managing comments and upvotes
+  const API = "https://ghost-challenge-submission.herokuapp.com"; // url of the server managing comments and upvotes
   const relativeTime = new RelativeTime(); // a Date formatting library
   const commentSubscribers = {};
   const threadedIndicatorClass = "border-l-2 -ml-10 pl-10";
