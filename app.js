@@ -8,7 +8,7 @@ const commentsRouter = require("./routes/comments");
 
 const app = express();
 
-app.use(cors());
+app.use(cors()); // WARNING: defaults to allow-all; see https://www.npmjs.com/package/cors#configuration-options
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
