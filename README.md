@@ -1,5 +1,7 @@
 # Coding challenge - Submission
 
+Live demo at https://ghost-challenge-submission.herokuapp.com
+
 ## Pre-requisites
 
 ### easy -- using the preconfigured database
